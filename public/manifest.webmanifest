@@ -1,0 +1,14 @@
+{
+  "name": "CoolHastorGames",
+  "short_name": "CHGames",
+  "description": "A huge collection of free minigames - arcade, puzzle, multiplayer and party games.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0f1a",
+  "theme_color": "#0b0f1a",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // This project uses a lightweight local identity (no Firebase Auth, which
+    // is billing-gated). Writes are validated by shape rather than by auth.
+
+    // Leaderboards: world-readable; a score entry must be a sane number and a
+    // short name. No deletes.
+    match /leaderboards/{gameId}/scores/{uid} {
+      allow read: if true;
+      allow create, update: if
+        request.resource.data.score is number &&
+        request.resource.data.score >= 0 &&
+        request.resource.data.score < 1000000000 &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() <= 24;
+      allow delete: if false;
+    }
+
+    // User profiles / cloud saves keyed by the local uid (low-stakes).
+    match /users/{uid} {
+      allow read, write: if true;
+      match /{document=**} {
+        allow read, write: if true;
+      }
+    }
+
+    // Daily challenge seeds: world-readable, create-once.
+    match /dailies/{day} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+
+    // Multiplayer + party rooms: casual, low-stakes; readable/writable by anyone
+    // with the room code. Turn/role logic is enforced client-side.
+    match /rooms/{code} {
+      allow read, create, update, delete: if true;
+      match /{document=**} {
+        allow read, write: if true;
+      }
+    }
+  }
+}

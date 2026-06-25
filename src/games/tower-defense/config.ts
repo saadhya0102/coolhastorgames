@@ -1,0 +1,213 @@
+import type { EnemyDef, EnemyKind, TowerDef, TowerKind } from "./types";
+
+/** Shared UI palette (parchment + ink + warm gold). */
+export const UI = {
+  ink: "#2a2118",
+  inkSoft: "#5b4a36",
+  panel: "#f4e6c8",
+  panelEdge: "#caa55e",
+  panelDark: "#2d2415",
+  gold: "#ffcb45",
+  goldDeep: "#d99a1c",
+  heart: "#ff5d6c",
+  good: "#5fd66b",
+  bad: "#ff6b5d",
+  rangeFill: "rgba(120,200,255,0.12)",
+  rangeStroke: "rgba(150,215,255,0.65)",
+  rangeBad: "rgba(255,110,90,0.18)",
+  rangeBadStroke: "rgba(255,120,100,0.8)",
+  shadow: "rgba(0,0,0,0.28)",
+} as const;
+
+export const BALANCE = {
+  totalWaves: 20,
+  /** per-wave HP growth: hp = base * (1 + (wave-1)*hpGrowth) */
+  hpGrowth: 0.16,
+  /** per-wave bounty growth */
+  bountyGrowth: 0.04,
+  /** wave-clear gold bonus = base + perWave*wave */
+  clearBonusBase: 18,
+  clearBonusPerWave: 3,
+  /** gold for calling a wave early = remaining seconds * this */
+  earlyCallPerSec: 3,
+  /** seconds between waves during build phase */
+  buildTime: 14,
+  /** seconds before the very first wave */
+  firstBuildTime: 8,
+  sellRefund: 0.7,
+  /** cap on enemy-hit sounds per frame to avoid audio spam */
+  maxHitSoundsPerFrame: 2,
+} as const;
+
+/** Tower archetype definitions. */
+export const TOWERS: Record<TowerKind, TowerDef> = {
+  archer: {
+    kind: "archer",
+    name: "Archer",
+    blurb: "Rapid single-shot. Hits air.",
+    icon: "➶",
+    damageType: "physical",
+    canHitFlying: true,
+    projectileSpeed: 14,
+    body: "#9d6b3f",
+    accent: "#ffe6a6",
+    levels: [
+      { cost: 70, range: 3.0, damage: 13, fireRate: 1.7 },
+      { cost: 60, range: 3.4, damage: 24, fireRate: 2.1 },
+      { cost: 110, range: 3.8, damage: 40, fireRate: 2.5, multishot: true },
+    ],
+  },
+  cannon: {
+    kind: "cannon",
+    name: "Cannon",
+    blurb: "Heavy splash. Ground only.",
+    icon: "◎",
+    damageType: "physical",
+    canHitFlying: false,
+    projectileSpeed: 8,
+    body: "#5b6470",
+    accent: "#ffd27a",
+    levels: [
+      { cost: 120, range: 2.7, damage: 42, fireRate: 0.55, splash: 1.1 },
+      { cost: 110, range: 2.9, damage: 70, fireRate: 0.6, splash: 1.3 },
+      { cost: 180, range: 3.1, damage: 115, fireRate: 0.7, splash: 1.6 },
+    ],
+  },
+  frost: {
+    kind: "frost",
+    name: "Frost",
+    blurb: "Chills and slows foes.",
+    icon: "❄",
+    damageType: "physical",
+    canHitFlying: true,
+    projectileSpeed: 11,
+    body: "#3f7fa6",
+    accent: "#d6f4ff",
+    levels: [
+      { cost: 90, range: 2.6, damage: 6, fireRate: 1.0, slow: 0.4, slowDur: 1.4 },
+      { cost: 80, range: 2.8, damage: 10, fireRate: 1.2, slow: 0.5, slowDur: 1.6 },
+      {
+        cost: 150,
+        range: 3.0,
+        damage: 16,
+        fireRate: 1.3,
+        slow: 0.6,
+        slowDur: 1.8,
+        aoeSlow: true,
+      },
+    ],
+  },
+  arcane: {
+    kind: "arcane",
+    name: "Arcane",
+    blurb: "Magic. Ignores armor.",
+    icon: "✦",
+    damageType: "magic",
+    canHitFlying: true,
+    projectileSpeed: 13,
+    body: "#7a52c9",
+    accent: "#e9c8ff",
+    levels: [
+      { cost: 140, range: 3.0, damage: 30, fireRate: 0.9 },
+      { cost: 130, range: 3.2, damage: 52, fireRate: 1.0 },
+      { cost: 210, range: 3.4, damage: 84, fireRate: 1.1, chain: 2 },
+    ],
+  },
+};
+
+export const TOWER_ORDER: TowerKind[] = ["archer", "cannon", "frost", "arcane"];
+
+/** Enemy archetype definitions (base stats at wave 1). */
+export const ENEMIES: Record<EnemyKind, EnemyDef> = {
+  grub: {
+    kind: "grub",
+    name: "Grub",
+    hp: 60,
+    speed: 1.6,
+    armor: 0,
+    flying: false,
+    leak: 1,
+    bounty: 6,
+    radius: 0.3,
+    body: "#7cae4c",
+    accent: "#557a30",
+  },
+  sprinter: {
+    kind: "sprinter",
+    name: "Sprinter",
+    hp: 40,
+    speed: 3.1,
+    armor: 0,
+    flying: false,
+    leak: 1,
+    bounty: 5,
+    radius: 0.24,
+    body: "#e0a93f",
+    accent: "#9c6f1e",
+  },
+  brute: {
+    kind: "brute",
+    name: "Brute",
+    hp: 240,
+    speed: 1.0,
+    armor: 0.45,
+    flying: false,
+    leak: 1,
+    bounty: 14,
+    radius: 0.38,
+    body: "#8a8f99",
+    accent: "#4a4f57",
+  },
+  wisp: {
+    kind: "wisp",
+    name: "Wisp",
+    hp: 75,
+    speed: 2.3,
+    armor: 0,
+    flying: true,
+    leak: 1,
+    bounty: 8,
+    radius: 0.28,
+    body: "#5fd0e0",
+    accent: "#bdf6ff",
+  },
+  swarmling: {
+    kind: "swarmling",
+    name: "Swarmling",
+    hp: 18,
+    speed: 2.4,
+    armor: 0,
+    flying: false,
+    leak: 1,
+    bounty: 2,
+    radius: 0.18,
+    body: "#c76b9a",
+    accent: "#7c3a5d",
+  },
+  warden: {
+    kind: "warden",
+    name: "Warden",
+    hp: 1400,
+    speed: 0.9,
+    armor: 0.3,
+    flying: false,
+    leak: 4,
+    bounty: 70,
+    radius: 0.55,
+    body: "#b8553f",
+    accent: "#ffd98a",
+  },
+  titan: {
+    kind: "titan",
+    name: "Rift Titan",
+    hp: 4200,
+    speed: 0.8,
+    armor: 0.35,
+    flying: false,
+    leak: 8,
+    bounty: 150,
+    radius: 0.7,
+    body: "#6e3bd6",
+    accent: "#ff9d4d",
+  },
+};

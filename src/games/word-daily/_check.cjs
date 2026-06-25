@@ -1,0 +1,12 @@
+const fs = require("fs");
+const t = fs.readFileSync(__dirname + "/words.ts", "utf8");
+const sec = t.split("EXTRA_ALLOWED");
+const grab = (s) => (s.match(/"[a-z]+"/g) || []).map((x) => x.slice(1, -1));
+const ans = grab(sec[0]);
+const ex = grab(sec[1]);
+const badA = ans.filter((w) => w.length !== 5);
+const badE = ex.filter((w) => w.length !== 5);
+const dupA = [...new Set(ans.filter((w, i) => ans.indexOf(w) !== i))];
+console.log("answers", ans.length, "bad:", JSON.stringify(badA));
+console.log("extra", ex.length, "bad:", JSON.stringify(badE));
+console.log("dupAnswers:", JSON.stringify(dupA));
